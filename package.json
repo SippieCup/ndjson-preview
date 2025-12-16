@@ -1,0 +1,73 @@
+{
+  "name": "ndjson-preview",
+  "displayName": "NDJSON Preview",
+  "description": "Preview pretty-printed JSON from NDJSON files line by line",
+  "version": "1.0.0",
+  "author": {
+    "name": "Seydi Ahmet Kiyak",
+    "email": "s.ahmet.kiyak@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ahi/ndjson-preview.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ahi/ndjson-preview/issues"
+  },
+  "homepage": "https://github.com/ahi/ndjson-preview#readme",
+  "keywords": [
+    "ndjson",
+    "jsonl",
+    "json",
+    "preview",
+    "viewer",
+    "json lines",
+    "newline delimited json"
+  ],
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:jsonl",
+    "onCommand:ndjson-preview.open"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "ndjson-preview.open",
+        "title": "Open NDJSON Preview"
+      }
+    ],
+    "languages": [
+      {
+        "id": "jsonl",
+        "aliases": ["NDJSON", "JSON Lines"],
+        "extensions": [".ndjson", ".jsonl"],
+        "configuration": "./language-configuration.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.60.0",
+    "@types/node": "16.x",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^4.4.0"
+  },
+  "dependencies": {
+    "pretty-print-json": "^3.0.3"
+  }
+}
