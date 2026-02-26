@@ -2,7 +2,7 @@
   "name": "ndjson-preview",
   "displayName": "NDJSON Preview",
   "description": "Preview pretty-printed JSON from NDJSON files line by line",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "author": {
     "name": "Seydi Ahmet Kiyak",
     "email": "s.ahmet.kiyak@gmail.com"
@@ -62,7 +62,8 @@
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
-    "compile": "tsc -p ./",
+    "compile": "tsc -p ./ && pnpm run copy-vendor",
+    "copy-vendor": "mkdir -p out/vendor/pretty-print-json && cp node_modules/pretty-print-json/dist/css/pretty-print-json.css out/vendor/pretty-print-json/ && cp node_modules/pretty-print-json/dist/pretty-print-json.min.js out/vendor/pretty-print-json/",
     "watch": "tsc -watch -p ./",
     "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint src",

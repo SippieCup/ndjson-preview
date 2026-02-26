@@ -52,7 +52,7 @@ export class PreviewPanel {
                     enableScripts: true,
                     retainContextWhenHidden: true,
                     localResourceRoots: [
-                        vscode.Uri.file(path.join(this.context.extensionPath, 'node_modules', 'pretty-print-json')),
+                        vscode.Uri.file(path.join(this.context.extensionPath, 'out', 'vendor', 'pretty-print-json')),
                     ],
                 },
             );
@@ -202,12 +202,12 @@ export class PreviewPanel {
         if (!this.panel) {
             throw new Error('Panel is not initialized');
         }
-        const libPath = path.join(this.context.extensionPath, 'node_modules', 'pretty-print-json');
+        const libPath = path.join(this.context.extensionPath, 'out', 'vendor', 'pretty-print-json');
         const cssUri = this.panel.webview.asWebviewUri(
-            vscode.Uri.file(path.join(libPath, 'dist', 'css', 'pretty-print-json.css')),
+            vscode.Uri.file(path.join(libPath, 'pretty-print-json.css')),
         ).toString();
         const jsUri = this.panel.webview.asWebviewUri(
-            vscode.Uri.file(path.join(libPath, 'dist', 'pretty-print-json.min.js')),
+            vscode.Uri.file(path.join(libPath, 'pretty-print-json.min.js')),
         ).toString();
         return { cssUri, jsUri };
     }
