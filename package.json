@@ -7,6 +7,12 @@
     "name": "Seydi Ahmet Kiyak",
     "email": "s.ahmet.kiyak@gmail.com"
   },
+  "contributors": [
+    {
+      "name": "Andrew Sidhu",
+      "email": "code@kozyops.com"
+    }
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -46,28 +52,47 @@
     "languages": [
       {
         "id": "jsonl",
-        "aliases": ["NDJSON", "JSON Lines"],
-        "extensions": [".ndjson", ".jsonl"],
+        "aliases": [
+          "NDJSON",
+          "JSON Lines"
+        ],
+        "extensions": [
+          ".ndjson",
+          ".jsonl"
+        ],
         "configuration": "./language-configuration.json"
       }
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "pnpm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts"
+    "pretest": "pnpm run compile && pnpm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vitest run",
+    "test:unit": "vitest run src/test/unit",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "package": "vsce package --no-dependencies"
   },
   "devDependencies": {
-    "@types/vscode": "^1.60.0",
-    "@types/node": "16.x",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "@typescript-eslint/parser": "^5.0.0",
-    "eslint": "^8.0.0",
-    "typescript": "^4.4.0"
+    "@commitlint/cli": "^20.4.2",
+    "@commitlint/config-conventional": "^20.4.2",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@types/node": "^25.3.1",
+    "@types/vscode": "^1.109.0",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vscode/vsce": "^3.7.1",
+    "eslint": "^10.0.2",
+    "semantic-release": "^25.0.3",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   },
   "dependencies": {
-    "pretty-print-json": "^3.0.3"
+    "pretty-print-json": "^3.0.6"
   }
 }

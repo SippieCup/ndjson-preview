@@ -1,0 +1,17 @@
+.github/**
+.vscode/**
+src/**
+coverage/**
+out/test/**
+node_modules/**
+.eslintrc.json
+.gitignore
+.npmrc
+tsconfig.json
+vitest.config.ts
+pnpm-lock.yaml
+CLAUDE.md
+.releaserc.json
+commitlint.config.js
+*.vsix
+**/*.map

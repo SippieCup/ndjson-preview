@@ -7,12 +7,14 @@ A powerful VS Code extension for viewing and analyzing NDJSON (Newline Delimited
 ## Features
 
 ### 📊 Live Preview with Syntax Highlighting
+
 - **Side-by-side view**: See pretty-printed JSON in a preview panel as you navigate through your NDJSON file
 - **Syntax highlighting**: Color-coded JSON with distinct colors for keys, strings, numbers, booleans, and null values
 - **Auto-updates**: Preview automatically updates as you move your cursor to different lines
 - **Line highlighting**: Current line is highlighted in the editor for easy tracking
 
 ### 🔍 Advanced Filtering
+
 - **Filter by key-value pairs**: Show only lines that match specific criteria
 - **Nested key support**: Use dot notation (e.g., `user.email`, `address.city`) to filter on nested properties
 - **Multiple filters**: Apply multiple filters with AND logic - lines must match all filters
@@ -20,6 +22,7 @@ A powerful VS Code extension for viewing and analyzing NDJSON (Newline Delimited
 - **Visual feedback**: Shows count of matching lines (e.g., "Showing 45 of 1000 lines")
 
 ### 🔧 Custom JSON Ordering
+
 - **Reorder Keys toggle**: Automatically sort JSON keys with primitives first, then objects/arrays
 - **Custom ordering**: Define your own key order - specify which keys should appear first
 - **Persistent preferences**: Custom order is saved globally and remembered between sessions
@@ -28,6 +31,7 @@ A powerful VS Code extension for viewing and analyzing NDJSON (Newline Delimited
 ## Installation
 
 ### From VSIX (Local Installation)
+
 1. Download the `.vsix` file
 2. Open VS Code
 3. Go to Extensions (`Ctrl+Shift+X` / `Cmd+Shift+X`)
@@ -35,6 +39,7 @@ A powerful VS Code extension for viewing and analyzing NDJSON (Newline Delimited
 5. Select the downloaded file
 
 ### From VS Code Marketplace
+
 1. Open VS Code
 2. Go to Extensions (`Ctrl+Shift+X` / `Cmd+Shift+X`)
 3. Search for "NDJSON Preview"
@@ -60,6 +65,7 @@ A powerful VS Code extension for viewing and analyzing NDJSON (Newline Delimited
 A new editor tab opens showing only lines that match all your filters. Click "Clear All" to remove filters and close the filtered view.
 
 **Example filters:**
+
 - `status` = `active` - Show only lines where status equals "active"
 - `user.role` = `admin` - Show lines where user.role equals "admin"
 - Multiple filters: `type` = `order` AND `status` = `completed`
@@ -67,19 +73,24 @@ A new editor tab opens showing only lines that match all your filters. Click "Cl
 ### Custom Key Ordering
 
 #### Using the Reorder Toggle
+
 Click the **"Reorder Keys"** toggle to automatically organize JSON with:
+
 - Primitive values (strings, numbers, booleans, null) first
 - Objects and arrays last
 
 #### Using Custom Order
+
 1. Click the **"Custom Order"** button
 2. Enter one key per line in your desired order:
+
    ```
    id
    name
    email
    status
    ```
+
 3. Click **"Apply"**
 
 Keys will appear in the order you specified, followed by any remaining keys. This preference is saved globally.
@@ -87,6 +98,7 @@ Keys will appear in the order you specified, followed by any remaining keys. Thi
 ## Keyboard Shortcuts
 
 In the filter modal:
+
 - **Enter** in the key field - Move to value field
 - **Enter** in the value field - Add the filter
 - **Esc** - Close modal (click outside also works)
@@ -102,42 +114,54 @@ The extension works with NDJSON (Newline Delimited JSON) files where each line c
 ```
 
 Supported file extensions:
+
 - `.ndjson`
 - `.jsonl`
 
 ## Configuration
 
 ### Global Settings
+
 - **Custom Order**: Saved globally in VS Code's global state
 - Persists across sessions and workspaces
 
 ### Per-Session Settings
+
 - **Filters**: Reset when the preview panel is closed
 - **Reorder Keys toggle**: Reset when the preview panel is closed
 
 ## Use Cases
 
 ### Log Analysis
+
 Filter server logs by status code, user ID, or error type:
+
 ```
 {"timestamp":"2024-01-15","level":"error","user_id":"123","message":"..."}
 {"timestamp":"2024-01-15","level":"info","user_id":"456","message":"..."}
 ```
+
 Filter: `level` = `error` to see only error logs
 
 ### Data Exploration
+
 Explore large datasets by filtering on specific attributes:
+
 ```
 {"product":"laptop","category":"electronics","price":999,"stock":50}
 {"product":"desk","category":"furniture","price":299,"stock":12}
 ```
+
 Filter: `category` = `electronics` to view only electronics
 
 ### API Response Analysis
+
 Analyze API responses with consistent key ordering:
+
 ```
 {"id":1,"data":{...},"metadata":{...},"status":"success"}
 ```
+
 Custom order: `id`, `status`, `data`, `metadata`
 
 ## Performance
@@ -156,10 +180,13 @@ git clone https://github.com/yourusername/ndjson-preview.git
 cd ndjson-preview
 
 # Install dependencies
-npm install
+pnpm install
 
 # Compile
-npm run compile
+pnpm run compile
+
+# Run tests
+pnpm run test
 
 # Run in development mode (Press F5 in VS Code)
 ```
@@ -169,10 +196,19 @@ npm run compile
 ```
 ndjson-preview/
 ├── src/
-│   └── extension.ts    # Main extension code
-├── package.json        # Extension manifest
-├── tsconfig.json       # TypeScript configuration
-└── README.md          # This file
+│   ├── extension.ts              # Entry point: activation, command registration
+│   ├── types.ts                  # Shared TypeScript interfaces
+│   ├── utils/
+│   │   ├── jsonUtils.ts          # JSON key reordering, nested value access
+│   │   ├── htmlUtils.ts          # HTML escaping utilities
+│   │   └── filterUtils.ts        # Line filtering logic
+│   ├── preview/
+│   │   └── previewPanel.ts       # Webview panel lifecycle and state
+│   └── webview/
+│       └── webviewContent.ts     # HTML/CSS/JS generation for webview
+├── package.json                  # Extension manifest
+├── tsconfig.json                 # TypeScript configuration
+└── README.md                     # This file
 ```
 
 ## Contributing
@@ -193,6 +229,7 @@ MIT
 ### 1.0.0
 
 Initial release with:
+
 - Live preview with syntax highlighting
 - Line-by-line navigation
 - Filter by key-value pairs
