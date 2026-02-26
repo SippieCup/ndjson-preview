@@ -593,6 +593,21 @@ key3">${customOrder.join('\n')}</textarea>
                     linkUrls: true,
                     quoteKeys: false
                 });
+                if (${uriDecodeEnabled}) {
+                    container.querySelectorAll('.json-string').forEach(function(el) {
+                        var text = el.textContent;
+                        if (text && text.length > 2 && text.startsWith('"') && text.endsWith('"')) {
+                            try {
+                                var raw = JSON.parse(text);
+                                if (typeof raw === 'string' && raw !== text.slice(1, -1)) {
+                                    el.textContent = '"' + raw + '"';
+                                }
+                            } catch(e) {
+                                // Leave as-is if parsing fails
+                            }
+                        }
+                    });
+                }
             }
         } catch (error) {
             console.error('Error rendering JSON:', error);
