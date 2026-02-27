@@ -1,4 +1,3 @@
-import * as path from 'path';
 import * as vscode from 'vscode';
 import type { Filter, PreviewState } from '../types';
 import { filterLines } from '../utils/filterUtils';
@@ -51,9 +50,6 @@ export class PreviewPanel {
                 {
                     enableScripts: true,
                     retainContextWhenHidden: true,
-                    localResourceRoots: [
-                        vscode.Uri.file(path.join(this.context.extensionPath, 'out', 'vendor', 'pretty-print-json')),
-                    ],
                 },
             );
 
@@ -89,8 +85,6 @@ export class PreviewPanel {
         const range = editor.document.lineAt(line).range;
         editor.setDecorations(this.decorationType, [range]);
 
-        const { cssUri, jsUri } = this.getLibraryUris();
-
         let html: string;
 
         if (!lineText) {
@@ -103,8 +97,6 @@ export class PreviewPanel {
                 uriDecodeEnabled: this.state.uriDecode,
                 customOrder: this.state.customOrder,
                 filters: this.state.activeFilters,
-                cssUri,
-                jsUri,
             });
         } else {
             try {
@@ -126,8 +118,6 @@ export class PreviewPanel {
                     uriDecodeEnabled: this.state.uriDecode,
                     customOrder: this.state.customOrder,
                     filters: this.state.activeFilters,
-                    cssUri,
-                    jsUri,
                 });
             } catch (error) {
                 html = getWebviewContent({
@@ -139,8 +129,6 @@ export class PreviewPanel {
                     uriDecodeEnabled: this.state.uriDecode,
                     customOrder: this.state.customOrder,
                     filters: this.state.activeFilters,
-                    cssUri,
-                    jsUri,
                 });
             }
         }
@@ -196,20 +184,6 @@ export class PreviewPanel {
                 }
                 break;
         }
-    }
-
-    private getLibraryUris(): { cssUri: string; jsUri: string } {
-        if (!this.panel) {
-            throw new Error('Panel is not initialized');
-        }
-        const libPath = path.join(this.context.extensionPath, 'out', 'vendor', 'pretty-print-json');
-        const cssUri = this.panel.webview.asWebviewUri(
-            vscode.Uri.file(path.join(libPath, 'pretty-print-json.css')),
-        ).toString();
-        const jsUri = this.panel.webview.asWebviewUri(
-            vscode.Uri.file(path.join(libPath, 'pretty-print-json.min.js')),
-        ).toString();
-        return { cssUri, jsUri };
     }
 
     private async createFilteredView(editor: vscode.TextEditor): Promise<void> {

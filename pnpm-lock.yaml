@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      pretty-print-json:
-        specifier: ^3.0.6
-        version: 3.0.6
     devDependencies:
       '@commitlint/cli':
         specifier: ^20.4.2
@@ -2475,9 +2471,6 @@ packages:
   pretty-ms@9.3.0:
     resolution: {integrity: sha512-gjVS5hOP+M3wMm5nmNOucbIrqudzs9v/57bWRHQWLYklXqoXKrVfYW2W9+glfGsqtPgpiz5WwyEEB+ksXIx3gQ==}
     engines: {node: '>=18'}
-
-  pretty-print-json@3.0.6:
-    resolution: {integrity: sha512-wboR7e5Vqim2giCXJouicwrfB/+whrJuVByBB2/ItHOmEgIEkqKfRiqLR9Rr297cJjplfAyEjwxJ2DJmiPk1yA==}
 
   process-nextick-args@2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
@@ -5594,8 +5587,6 @@ snapshots:
   pretty-ms@9.3.0:
     dependencies:
       parse-ms: 4.0.0
-
-  pretty-print-json@3.0.6: {}
 
   process-nextick-args@2.0.1: {}
 

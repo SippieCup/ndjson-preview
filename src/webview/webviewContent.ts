@@ -2,7 +2,7 @@ import type { WebviewContentOptions } from '../types';
 import { escapeHtml, escapeJsonForHtml } from '../utils/htmlUtils';
 
 export function getWebviewContent(options: WebviewContentOptions): string {
-    const { json, lineNumber, isError, reorderEnabled, wordWrapEnabled, uriDecodeEnabled, customOrder, filters, cssUri, jsUri } = options;
+    const { json, lineNumber, isError, reorderEnabled, wordWrapEnabled, uriDecodeEnabled, customOrder, filters } = options;
 
     const content = isError
         ? `<div class="error">${escapeHtml(String(json))}</div>`
@@ -16,7 +16,6 @@ export function getWebviewContent(options: WebviewContentOptions): string {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NDJSON Preview</title>
-    <link rel="stylesheet" href="${cssUri}">
     <style>
         body {
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
@@ -253,13 +252,14 @@ export function getWebviewContent(options: WebviewContentOptions): string {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        /* Override pretty-print-json library defaults for theme compatibility */
         .json-container {
             background-color: transparent !important;
             padding: 15px;
             border-radius: 4px;
             overflow: auto;
             white-space: pre;
+            font-size: 13px;
+            line-height: 1.8;
         }
         .json-container.word-wrap {
             white-space: pre-wrap;
@@ -294,7 +294,6 @@ export function getWebviewContent(options: WebviewContentOptions): string {
         .json-mark {
             color: var(--vscode-editor-foreground) !important;
         }
-        /* Override library link colors */
         a.json-link {
             color: var(--vscode-textLink-foreground) !important;
         }
@@ -304,16 +303,61 @@ export function getWebviewContent(options: WebviewContentOptions): string {
         a.json-link:visited {
             color: var(--vscode-textLink-foreground) !important;
         }
-        /* Override library alternating row backgrounds */
-        ol.json-lines > li:nth-child(odd),
-        ol.json-lines > li:nth-child(even) {
-            background-color: transparent !important;
+        /* Collapsible tree nodes — VS Code-style fold gutter */
+        .json-block {
+            display: block;
         }
-        ol.json-lines > li:hover {
-            background-color: var(--vscode-list-hoverBackground) !important;
+        .json-block > summary {
+            display: block;
+            position: relative;
+            cursor: pointer;
+            list-style: none;
         }
-        ol.json-lines > li::marker {
-            color: var(--vscode-editorLineNumber-foreground) !important;
+        .json-block > summary::-webkit-details-marker {
+            display: none;
+        }
+        .json-block > summary::marker {
+            content: "";
+            display: none;
+        }
+        .fold-chevron {
+            display: inline-block;
+            width: 1.5em;
+            margin-left: -1.5em;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            font-size: 1.8em;
+            line-height: 1;
+            vertical-align: 0.05em;
+            color: var(--vscode-editorCodeLens-foreground, var(--vscode-descriptionForeground));
+        }
+        details[open].json-block > summary > .fold-chevron::after {
+            content: "⌄";
+            vertical-align: 0.07em;
+        }
+        details.json-block:not([open]) > summary > .fold-chevron::after {
+            content: "›";
+            vertical-align: -0.1em;
+        }
+        .json-collapsed-preview {
+            display: none;
+            color: var(--vscode-descriptionForeground);
+            font-style: italic;
+        }
+        details.json-block:not([open]) > summary .json-collapsed-preview {
+            display: inline;
+        }
+        .json-fold-body {
+            margin-left: 0.7em;
+            padding-left: 1.3em;
+            border-left: 1px solid var(--vscode-editorIndentGuide-background, rgba(128, 128, 128, 0.3));
+        }
+        .json-close {
+            display: block;
+        }
+        .json-line {
+            display: block;
         }
         .error {
             color: var(--vscode-errorForeground);
@@ -398,7 +442,6 @@ key3">${customOrder.join('\n')}</textarea>
             </div>
         </div>
     </div>
-    <script src="${jsUri}"></script>
     <script>
         const vscode = acquireVsCodeApi();
         const hamburgerBtn = document.getElementById('hamburger-btn');
@@ -580,34 +623,102 @@ key3">${customOrder.join('\n')}</textarea>
             });
         });
 
+        // Custom JSON renderer
+        function renderString(str, decode) {
+            var urlRegex = /https?:\\/\\/[^\\s"]+/g;
+            if (decode) {
+                var content = escapeHtml(str);
+                content = content.replace(urlRegex, function(url) {
+                    return '<a class="json-link" href="' + escapeHtml(url) + '" title="' + escapeHtml(url) + '">' + escapeHtml(url) + '</a>';
+                });
+                return '<span class="json-string">"' + content + '"</span>';
+            } else {
+                var jsonStr = JSON.stringify(str);
+                var inner = jsonStr.slice(1, -1);
+                var content = escapeHtml(inner);
+                content = content.replace(urlRegex, function(url) {
+                    return '<a class="json-link" href="' + escapeHtml(url) + '" title="' + escapeHtml(url) + '">' + escapeHtml(url) + '</a>';
+                });
+                return '<span class="json-string">"' + content + '"</span>';
+            }
+        }
+
+        function isCollapsible(val) {
+            if (val === null || typeof val !== 'object') return false;
+            if (Array.isArray(val)) return val.length > 0;
+            return Object.keys(val).length > 0;
+        }
+
+        function renderLeaf(val, decode) {
+            if (val === null) return '<span class="json-null">null</span>';
+            if (typeof val === 'boolean') return '<span class="json-boolean">' + val + '</span>';
+            if (typeof val === 'number') return '<span class="json-number">' + val + '</span>';
+            if (typeof val === 'string') return renderString(val, decode);
+            if (Array.isArray(val) && val.length === 0) return '<span class="json-mark">[]</span>';
+            if (typeof val === 'object' && Object.keys(val).length === 0) return '<span class="json-mark">{}</span>';
+            return escapeHtml(String(val));
+        }
+
+        function renderCollapsible(val, decode, prefix, isLast) {
+            var isArr = Array.isArray(val);
+            var open = isArr ? '[' : '{';
+            var close = isArr ? ']' : '}';
+            var entries = isArr ? val : Object.keys(val);
+            var count = entries.length;
+            var label = isArr ? (count === 1 ? ' item' : ' items') : (count === 1 ? ' key' : ' keys');
+            var previewText = ' ' + count + label + ' ';
+            var commaHtml = isLast ? '' : '<span class="json-mark">,</span>';
+            var commaText = isLast ? '' : ',';
+
+            var childrenHtml = '';
+            if (isArr) {
+                for (var i = 0; i < val.length; i++) {
+                    var last = (i === val.length - 1);
+                    if (isCollapsible(val[i])) {
+                        childrenHtml += renderCollapsible(val[i], decode, '', last);
+                    } else {
+                        childrenHtml += '<div class="json-line">' + renderLeaf(val[i], decode) + (last ? '' : '<span class="json-mark">,</span>') + '</div>';
+                    }
+                }
+            } else {
+                var keys = Object.keys(val);
+                for (var i = 0; i < keys.length; i++) {
+                    var k = keys[i];
+                    var last = (i === keys.length - 1);
+                    var keyHtml = '<span class="json-key">' + escapeHtml(k) + '</span><span class="json-mark">: </span>';
+                    if (isCollapsible(val[k])) {
+                        childrenHtml += renderCollapsible(val[k], decode, keyHtml, last);
+                    } else {
+                        childrenHtml += '<div class="json-line">' + keyHtml + renderLeaf(val[k], decode) + (last ? '' : '<span class="json-mark">,</span>') + '</div>';
+                    }
+                }
+            }
+
+            return '<details open class="json-block">' +
+                '<summary><span class="fold-chevron"></span>' + prefix +
+                '<span class="json-mark">' + open + '</span>' +
+                '<span class="json-collapsed-preview">' + escapeHtml(previewText) + close + commaText + '</span>' +
+                '</summary>' +
+                '<div class="json-fold-body">' + childrenHtml + '</div>' +
+                '<span class="json-close"><span class="json-mark">' + close + '</span>' + commaHtml + '</span>' +
+                '</details>';
+        }
+
+        function renderJson(val, decode) {
+            if (isCollapsible(val)) {
+                return renderCollapsible(val, decode, '', true);
+            }
+            return renderLeaf(val, decode);
+        }
+
         // Render the JSON with syntax highlighting
         ${isError ? '' : `
         try {
-            const jsonDataEl = document.getElementById('json-data');
-            const jsonData = JSON.parse(jsonDataEl.textContent);
-            const container = document.querySelector('.json-container');
-            if (jsonData !== null && container && typeof prettyPrintJson !== 'undefined') {
-                container.innerHTML = prettyPrintJson.toHtml(jsonData, {
-                    indent: 2,
-                    lineNumbers: false,
-                    linkUrls: true,
-                    quoteKeys: false
-                });
-                if (${uriDecodeEnabled}) {
-                    container.querySelectorAll('.json-string').forEach(function(el) {
-                        var text = el.textContent;
-                        if (text && text.length > 2 && text.startsWith('"') && text.endsWith('"')) {
-                            try {
-                                var raw = JSON.parse(text);
-                                if (typeof raw === 'string' && raw !== text.slice(1, -1)) {
-                                    el.textContent = '"' + raw + '"';
-                                }
-                            } catch(e) {
-                                // Leave as-is if parsing fails
-                            }
-                        }
-                    });
-                }
+            var jsonDataEl = document.getElementById('json-data');
+            var jsonData = JSON.parse(jsonDataEl.textContent);
+            var container = document.querySelector('.json-container');
+            if (container) {
+                container.innerHTML = renderJson(jsonData, ${uriDecodeEnabled});
             }
         } catch (error) {
             console.error('Error rendering JSON:', error);

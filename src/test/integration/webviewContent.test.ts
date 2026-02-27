@@ -17,8 +17,6 @@ function renderHtml(overrides: Partial<WebviewContentOptions> = {}): string {
     uriDecodeEnabled: false,
     customOrder: [],
     filters: [],
-    cssUri: 'https://example.com/pretty-print-json.css',
-    jsUri: 'https://example.com/pretty-print-json.min.js',
   };
   return getWebviewContent({ ...defaults, ...overrides });
 }
@@ -56,15 +54,6 @@ describe('webview HTML structure', () => {
   it('includes json-container for JSON output', () => {
     const html = renderHtml();
     expect(html).toContain('class="json-container"');
-  });
-
-  it('includes the external CSS and JS URIs', () => {
-    const html = renderHtml({
-      cssUri: 'vscode-resource://css/style.css',
-      jsUri: 'vscode-resource://js/script.js',
-    });
-    expect(html).toContain('href="vscode-resource://css/style.css"');
-    expect(html).toContain('src="vscode-resource://js/script.js"');
   });
 
   it('includes nested JSON data (escaped) in script element', () => {
@@ -120,12 +109,12 @@ describe('webview error state', () => {
       json: 'Error message',
       isError: true,
     });
-    expect(html).not.toContain('prettyPrintJson.toHtml');
+    expect(html).not.toContain('renderJson(jsonData');
   });
 
   it('includes JSON rendering script when NOT in error state', () => {
     const html = renderHtml({ isError: false });
-    expect(html).toContain('prettyPrintJson.toHtml');
+    expect(html).toContain('renderJson(jsonData');
   });
 });
 
@@ -202,12 +191,6 @@ describe('webview theming', () => {
     expect(html).not.toMatch(/background(?:-color)?:\s*black\b/i);
     expect(html).not.toMatch(/background(?:-color)?:\s*#000(?:000)?\b/i);
     expect(html).not.toMatch(/background(?:-color)?:\s*rgb\(0,\s*0,\s*0\)/i);
-  });
-
-  it('overrides library alternating row backgrounds to transparent', () => {
-    const html = renderHtml();
-    expect(html).toContain('ol.json-lines > li:nth-child(odd)');
-    expect(html).toContain('ol.json-lines > li:nth-child(even)');
   });
 
   it('uses VS Code theme variable for link colors', () => {

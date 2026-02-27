@@ -62,8 +62,7 @@
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
-    "compile": "tsc -p ./ && pnpm run copy-vendor",
-    "copy-vendor": "mkdir -p out/vendor/pretty-print-json && cp node_modules/pretty-print-json/dist/css/pretty-print-json.css out/vendor/pretty-print-json/ && cp node_modules/pretty-print-json/dist/pretty-print-json.min.js out/vendor/pretty-print-json/",
+    "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint src",
@@ -89,7 +88,5 @@
     "typescript-eslint": "^8.56.1",
     "vitest": "^4.0.18"
   },
-  "dependencies": {
-    "pretty-print-json": "^3.0.6"
-  }
+  "dependencies": {}
 }

@@ -20,6 +20,4 @@ export interface WebviewContentOptions {
     uriDecodeEnabled: boolean;
     customOrder: string[];
     filters: Filter[];
-    cssUri: string;
-    jsUri: string;
 }
